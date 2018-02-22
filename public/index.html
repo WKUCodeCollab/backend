@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Hello, world!</title>
+        <!-- CSS -->
+        <style></style>
+    </head>
+    <body>
+        <div id="test">
+            <h1>This is a test page for working on the backend</h1>
+        </div>
+
+        <!-- JS -->
+        <script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+        <script>
+            $("body").ready(function() {
+                $.ajax('https://api.giphy.com/v1/gifs/random', { 
+                    data: { 
+                        "api_key": "OERGawqLAkE6lSSNvj6rH7OX80QqZebK", //no steal pls
+                        "tag": "dancing"
+                    }, 
+                    success: function(data, status, xhr) {
+                        var embed = "<iframe src=\""+data.data.embed_url+"\" width=\"480\" height=\"480\" frameBorder=\"0\" class=\"giphy-embed\" allowFullScreen></iframe>";
+                        $("#test").append(embed);
+                    }, 
+                    error: function(xhr, status, errorThrown) { 
+                        //create a sad gif saying it didn't work 
+                    }, 
+                    method: 'GET', 
+                    dataType: 'json'
+                });
+            });
+        </script>
+    </body>
+</html>
