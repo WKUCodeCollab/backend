@@ -17,3 +17,5 @@ get a group - group
 get all groups - group
 get all groups that have a specific member - group
 send group invite - group
+
+http://docs.sequelizejs.com/class/lib/model.js~Model.html
