@@ -1,0 +1,19 @@
+login - user
+logout - user
+
+create friend request - friendrequest
+accept friend request - friendrequest, friends
+deny friend request - friendrequest
+get friend requests - friendrequest
+
+create message group - messagegroup
+get message groups - messagegroup
+create a message - message, messagegroup
+
+create group - group
+add user to group - group
+remove user from group - group
+get a group - group
+get all groups - group
+get all groups that have a specific member - group
+send group invite - group
