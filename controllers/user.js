@@ -35,8 +35,8 @@ module.exports.addUser = user => new Promise(async (resolve, reject) => {
     try {
         let salt = await bcrypt.genSalt();
         let hash = await bcrypt.hash(user.password, salt);
-        user.password = hash;
-        let data = await models.User.save(u);
+        user.setDataValue('password', hash);
+        let data = await user.save();
         resolve(data);
     } catch (err) {
         reject(err);

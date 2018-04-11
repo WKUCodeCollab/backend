@@ -6,8 +6,10 @@
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "~1.18.2",
     "cookie-parser": "~1.4.3",
+    "cors": "^2.8.4",
     "debug": "~2.6.9",
     "express": "~4.15.5",
     "morgan": "~1.9.0",
@@ -16,6 +18,8 @@
     "pg-hstore": "^2.3.2",
     "pug": "2.0.0-beta11",
     "sequelize": "^4.37.4",
-    "serve-favicon": "~2.4.5"
+    "serve-favicon": "~2.4.5",
+    "shelljs": "^0.8.1",
+    "socket.io": "^2.1.0"
   }
 }

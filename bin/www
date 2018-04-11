@@ -32,6 +32,9 @@ models.sequelize.sync()
     debug('Server started on port '+port);
     server.on('error', onError);
     server.on('listening', onListening);
+
+    var io = require('socket.io').listen(server);
+    require('../sockets/server')(io);
   })
 
 /**
