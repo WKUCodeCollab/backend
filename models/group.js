@@ -1,8 +1,7 @@
 'use strict';
 module.exports = (sequelize, DataTypes) => {
   var Group = sequelize.define('Group', {
-    currentCode: DataTypes.TEXT,
-    members: DataTypes.BLOB
+    currentCode: DataTypes.TEXT
   }, {});
   Group.associate = function(models) {
     Group.belongsTo(models.User, {
