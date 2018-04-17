@@ -26,16 +26,20 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-models.sequelize.sync()
-  .then(function() {
-    server.listen(port);
-    debug('Server started on port '+port);
-    server.on('error', onError);
-    server.on('listening', onListening);
-
-    var io = require('socket.io').listen(server);
-    require('../sockets/server')(io);
+models.sequelize.authenticate()
+  .then(() => {
+    debug('Database connection successful!');
+    models.sequelize.sync()
+      .then(() => {
+        debug('Synchronization complete!');
+        server.listen(port);
+        debug('Server started on port ' + port);
+        server.on('error', onError);
+        server.on('listening', onListening);
+      })
+      .catch(err => console.log(err));
   })
+  .catch(err => console.log(err));
 
 /**
  * Normalize a port into a number, string, or false.
