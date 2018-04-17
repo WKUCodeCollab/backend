@@ -20,7 +20,7 @@ router.get('/', function(req, res, next) {
 
 // GET user info minus password
 router.get('/me', VerifyToken, function(req, res, next) {      
-  userController.getUserById(decoded.id)
+  userController.getUserById(req.userId)
   .then((user) => {
     if (!user) return res.status(404).send("No user found.");
     user.password = "0";
@@ -72,7 +72,7 @@ router.post('/login', function(req, res) {
       expiresIn: 86400 // expires in 24 hours
     });
 
-    res.status(200).send({ auth: true, token: token });
+    res.status(200).send({ auth: true, token: token, expiresIn: 86400 });
   }, (err) => {
     if (err) return res.status(500).send('Error on the server.');
   });

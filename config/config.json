@@ -1,8 +1,8 @@
 {
   "development": {
     "username": "root",
-    "password": "codecollab2018",
-    "database": "cc_test",
+    "password": null,
+    "database": "cc-test",
     "host": "127.0.0.1",
     "dialect": "mysql",
     "operatorAliases": false

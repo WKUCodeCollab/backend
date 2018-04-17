@@ -19,7 +19,7 @@ module.exports.removeGroupMember = (groupId, userId) => new Promise(async (resol
         const data = await models.GroupMembers.destroy({
             where: {groupId: groupId, userid: userId},
             limit: 1
-        })
+        });
         resolve(data);
     } catch(err) {
         reject(err);
