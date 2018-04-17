@@ -20,7 +20,7 @@ router.get('/', function(req, res, next) {
 });
 
 // GET user info minus password
-router.get('/me', VerifyToken, function(req, res, next) {      
+/* router.get('/me', VerifyToken, function(req, res, next) {      
   userController.getUserById(decoded.id)
   .then((user) => {
     if (!user) return res.status(404).send("No user found.");
@@ -30,14 +30,24 @@ router.get('/me', VerifyToken, function(req, res, next) {
     if (err) return res.status(500).send("There was a problem finding the user.");
   });
 });
+ */
+
+// the authenticate middleware checks for the current user stored in the jwt
+router.get('/me', passport.authenticate('jwt', { session: false }), (req, res) => {
+  delete req.user.password;
+  res.status(200).json({ success: true, profile: req.user});
+});
 
 // middleware function
 router.use(function (user, req, res, next) {
   res.status(200).send(user);
 });
 
+// delete user
+
+
 /* POST new user. */
-router.post('/register', function(req, res, next) {
+/* router.post('/register', function(req, res, next) {
   let newUser = models.User.build({      // create a new instance of the User model
     firstName: req.body.firstName,  // set the user name... (comes from the request)
     lastName: req.body.lastName,
@@ -57,10 +67,12 @@ router.post('/register', function(req, res, next) {
   }, (err) => {
     if (err) return res.status(500).send("There was a problem registering the user.");
   });
-});
+}); */
 
 
 // POST login
+/* 
+passport.authenticate middleware takes care of most of this
 router.post('/login', function(req, res) {
   userController.getUserByEmail(req.body.email)
   .then((user) => {
@@ -77,11 +89,6 @@ router.post('/login', function(req, res) {
   }, (err) => {
     if (err) return res.status(500).send('Error on the server.');
   });
-});
-
-router.post('/login', passport.authenticate('local', { session: false }), (req, res) => {
-  const token = jwt.sign({ id: req.user.id }, config.secret);
-  res.status(200).json({ success: true, token: 'JWT ' + token });
-});
+}); */
 
 module.exports = router;

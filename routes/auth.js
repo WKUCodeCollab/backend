@@ -28,4 +28,16 @@ router.post('/register', (req, res) => {
     .catch(err => res.status(400).json({ success: false, err: err.toString() }));
 });
 
+// verify token
+router.post('/verify', (req, res) => {
+  let token = req.body.token;
+  jwt.verify(token.replace(/^JWT (.*)$/, '$1'), secret, (err, payload) => {
+    if(err || !payload) { 
+      res.status(400).json({ success: false }); 
+    } else { 
+      res.status(200).json({ success: true }); 
+    }
+  })
+});
+
 module.exports = router;
