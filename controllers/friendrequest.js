@@ -1,4 +1,5 @@
 const models = require('../models');
+const Promise = require('bluebird');
 
 module.exports.createFriendRequest = (user1, user2) => new Promise(async (resolve, reject) => {
     try {        

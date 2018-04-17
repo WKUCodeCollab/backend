@@ -1,9 +1,10 @@
 
 var express = require('express');
 var router = express.Router();
+/* This stuff comes up in the app.js - shouldn't need it here
 var bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: false }));
-router.use(bodyParser.json());
+router.use(bodyParser.json()); */
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
 var userController = require('../controllers/user');
@@ -23,7 +24,7 @@ router.get('/me', VerifyToken, function(req, res, next) {
   userController.getUserById(req.userId)
   .then((user) => {
     if (!user) return res.status(404).send("No user found.");
-    user.password = "0";
+    delete user.password;
     res.status(200).send(user);
   }, (err) => {
     if (err) return res.status(500).send("There was a problem finding the user.");
@@ -78,7 +79,9 @@ router.post('/login', function(req, res) {
   });
 });
 
-
-
+router.post('/login', passport.authenticate('local', { session: false }), (req, res) => {
+  const token = jwt.sign({ id: req.user.id }, config.secret);
+  res.status(200).json({ success: true, token: 'JWT ' + token });
+});
 
 module.exports = router;
