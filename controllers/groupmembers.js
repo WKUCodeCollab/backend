@@ -28,8 +28,8 @@ module.exports.removeGroupMember = (groupId, userId) => new Promise(async (resol
 
 module.exports.getUsersGroups = (userId) => new Promise(async( resolve, reject) => {
     try{
-        const data = await modelds.GroupMembers.findAll({where: {UserId: userId}});
-        resolve (data);
+        const data = await models.GroupMembers.findAll({where: {UserId: userId}});
+        resolve(data);
     }catch(err) {
         reject(err);
     }

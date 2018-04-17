@@ -1,22 +1,50 @@
 var express = require('express');
 var router = express.Router();
-var bodyParser = require('body-parser');
-router.use(bodyParser.urlencoded({ extended: false }));
-router.use(bodyParser.json());
-var groupController = require('../controllers/group');
-var models = require('../models');
-var VerifyToken = require('./VerifyToken');
+var groupController = require('../../controllers/group');
+var groupMemberController = require('../../controllers/groupmembers');
+var models = require('../../models');
 
-// POST login
-router.post('/creategroup', function(req, res) {
-    groupController.createGroup(req.body.userId)
-    .then((group) => {
-      if (!group) return res.status(500).send('Error creating group');
-
-      res.status(200).send({ groupId: group.id });
-    }, (err) => {
-      if (err) return res.status(500).send('Error on the server.');
-    });
+router.get('/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  try {
+    const members = await groupMemberController.getGroupMembers(+req.params.id);
+    if (!members) { res.status(404).json({ success: false }); }
+    if(members.contains(req.user.id)) {
+      const data = await groupController.getGroupById(+req.params.id);
+      if (!data) { res.status(404).json({ success: false }); }
+      else { res.status(200).json({ success: true, data }); }
+    } else {
+      // change this to 404 in prod to avoid injection attempts
+      res.status(401).json({ success: false });
+    }
+  } catch (err) {
+    res.status(400).json({ success: false, err });
+  }
 });
+
+router.get('/user', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  try {
+    const groups = await groupMemberController.getUsersGroups(req.user.id);
+    if(!groups) {
+      // 204 means it went through but no content returned, meaning the user is in no groups
+      res.status(204).json({ success: true, groups: null });
+    } else {
+      res.status(200).json({ success: true, groups });
+    }
+  } catch (err) {
+    res.status(400).json({ success: false, err });
+  }
+});
+
+router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  try {
+    const data = await groupController.createGroup(req.user.id);
+  } catch (err) {}
+});
+
+// add a group
+// remove a group
+// update a group
+// add user to a group
+// remove user from a group
 
 module.exports = router;
