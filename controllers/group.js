@@ -17,17 +17,28 @@ module.exports.createGroup = userId => new Promise(async (resolve, reject) => {
             creator: userId
         });
         let data = group.save();
-        membersController.addGroupMember(userId);
+        await membersController.addGroupMember(userId);
         resolve(data);
     } catch(err) {
         reject(err);
     }
 });
 
+module.exports.deleteGroup = id => new Promise(async (resolve, reject) => {
+    try {
+        const data = await models.Group.destroy({
+            where: { id: id },
+            limit: 1,
+        });
+        resolve(data);
+    } catch (err) {
+        reject(err);
+    }
+});
 
 module.exports.saveCode = (newCode, groupId) => new Promise(async (resolve, reject) => {
     try{
-        let data = models.Group.update(
+        let data = await models.Group.update(
             {code: newCode},
             {where: {id: groupId}}
         );
