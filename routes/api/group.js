@@ -3,6 +3,28 @@ var router = express.Router();
 var groupController = require('../../controllers/group');
 var groupMemberController = require('../../controllers/groupmembers');
 var models = require('../../models');
+const passport = require('passport');
+
+
+//create a group
+router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
+  groupController.createGroup(req.body.roomName, req.body.userId)
+  .then((group) => {
+    res.status(200).json({ success: true, groupId: group.id });
+  }, (err) => {
+    if (err) return res.status(500).send({ success: false, err });
+  });
+});
+
+//get all groups
+router.get('/',  passport.authenticate('jwt', { session: false }), async (req, res) =>{
+  groupController.getAllGroups()
+  .then((groups) => {
+    res.status(200).json({ success: true, groups });
+  }, (err) => {
+    if (err) return res.status(500).send({ success: false, err });
+  });
+});
 
 //get a single group by id
 router.get('/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
@@ -32,16 +54,6 @@ router.get('/user', passport.authenticate('jwt', { session: false }), async (req
     } else {
       res.status(200).json({ success: true, groups });
     }
-  } catch (err) {
-    res.status(400).json({ success: false, err });
-  }
-});
-
-//create a group
-router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
-  try {
-    const data = await groupController.createGroup(req.user.id);
-    res.status(200).json({ success: true, data });
   } catch (err) {
     res.status(400).json({ success: false, err });
   }

@@ -3,15 +3,27 @@ const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const secret = process.env.SECRET || require('../config/config').secret;
 const UserController = require('../controllers/user');
+const models = require('../models');
+const bcrypt = require('bcryptjs');
 
 const router = express.Router();
 
 // login
 router.post('/login', passport.authenticate('local', { session: false }), (req, res) => {
-  const token = jwt.sign(req.user.id, secret, {
-    expiresIn: 60 * 60 * 24
+  UserController.getUserByEmail(req.body.email)
+  .then((user) => {
+    if (!user) return res.status(404).send('No user found.');
+
+    var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
+    if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
+
+    const token = jwt.sign({ id: user.id }, secret, {
+      expiresIn: 86400
+    });
+    res.status(200).json({ success: true, token: token });
+  }, (err) => {
+    if (err) return res.status(500).send('Error on the server.');
   });
-  res.status(200).json({ success: true, token: 'JWT ' + token });
 });
 
 // logout
@@ -23,7 +35,14 @@ router.get('/logout', (req, res) => {
 
 // register
 router.post('/register', (req, res) => {
-  UserController.addUser(req.body)
+  let newUser = models.User.build({      // create a new instance of the User model
+    firstName: req.body.firstName,  // set the user name... (comes from the request)
+    lastName: req.body.lastName,
+    email: req.body.email,
+    password: req.body.password
+  });
+
+  UserController.addUser(newUser)
     .then(data => res.status(200).json({ success: true, data: data.id }))
     .catch(err => res.status(400).json({ success: false, err: err.toString() }));
 });
@@ -31,7 +50,7 @@ router.post('/register', (req, res) => {
 // verify token
 router.post('/verify', (req, res) => {
   let token = req.body.token;
-  jwt.verify(token.replace(/^JWT (.*)$/, '$1'), secret, (err, payload) => {
+  jwt.verify(token, secret, (err, payload) => {
     if(err || !payload) { 
       res.status(400).json({ success: false }); 
     } else { 

@@ -2,9 +2,10 @@ var express = require('express');
 var router = express.Router();
 var jwt = require('jsonwebtoken');
 var bcrypt = require('bcryptjs');
-var userController = require('../controllers/user');
-var models = require('../models');
-var config = require('../config/config');
+var userController = require('../../controllers/user');
+var models = require('../../models');
+var config = require('../../config/config');
+const passport = require('passport');
 
 // the authenticate middleware checks for the current user stored in the jwt
 router.get('/me', passport.authenticate('jwt', { session: false }), (req, res) => {

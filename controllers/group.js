@@ -2,6 +2,15 @@ const models = require('../models');
 const membersController = require('./groupmembers');
 const Promise = require('bluebird');
 
+module.exports.getAllGroups = () => new Promise(async (resolve, reject) => {
+    try {
+        const groups = await models.Group.findAll();
+        resolve(groups);
+    } catch (err) {
+        reject(err);
+    }
+});
+
 module.exports.getGroupById = id => new Promise(async (resolve, reject) => {
     try {
         const group = await models.Group.findById(id);
@@ -11,13 +20,13 @@ module.exports.getGroupById = id => new Promise(async (resolve, reject) => {
     }
 });
 
-module.exports.createGroup = userId => new Promise(async (resolve, reject) => {
+module.exports.createGroup = (roomName, userId) => new Promise(async (resolve, reject) => {
     try{
         let group = await models.Group.build({
+            groupName: roomName,
             creator: userId
         });
         let data = group.save();
-        await membersController.addGroupMember(userId);
         resolve(data);
     } catch(err) {
         reject(err);
