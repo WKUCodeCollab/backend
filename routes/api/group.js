@@ -8,44 +8,57 @@ const passport = require('passport');
 
 //create a group
 router.post('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
-  groupController.createGroup(req.body.roomName, req.body.userId)
+  /* groupController.createGroup(req.body.roomName, req.user.id)
   .then((group) => {
     res.status(200).json({ success: true, groupId: group.id });
   }, (err) => {
     if (err) return res.status(500).send({ success: false, err });
-  });
+  }); */
+
+  try {
+    const data = await groupController.createGroup(req.body.roomName, req.user.id);
+    if(!data) res.status(404).json({ success: false, data });
+    else res.status(200).json({ success: true, groupID: data.id });
+  } catch (err) {
+    res.status(500).json({ success: false, err: err.message });
+  }
 });
 
 //get all groups
 router.get('/',  passport.authenticate('jwt', { session: false }), async (req, res) =>{
-  groupController.getAllGroups()
+  /* groupController.getAllGroups()
   .then((groups) => {
     res.status(200).json({ success: true, groups });
   }, (err) => {
     if (err) return res.status(500).send({ success: false, err });
-  });
+  }); */
+
+  try {
+    const groups = await groupController.getAllGroups();
+    if(!groups) res.status(404).json({ success: false, groups });
+    else res.status(200).json({ success: true, groups });
+  } catch (err) {
+    res.status(500).json({ success: false, err: err.message });
+  }
 });
 
 //get a single group by id
 router.get('/:id', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const members = await groupMemberController.getGroupMembers(+req.params.id);
-    if (!members) { res.status(404).json({ success: false }); }
-    if(members.contains(req.user.id)) {
-      const data = await groupController.getGroupById(+req.params.id);
-      if (!data) { res.status(404).json({ success: false }); }
-      else { res.status(200).json({ success: true, data }); }
+    const data = await groupController.getGroupById(+req.params.id);
+    if(!data || (Object.keys(data).length === 0 && data.constructor === Object)) {
+      res.status(404).json({ success: false, data });
     } else {
-      // change this to 404 in prod to avoid injection attempts
-      res.status(401).json({ success: false });
+      res.status(200).json({ success: true, data });
     }
   } catch (err) {
-    res.status(400).json({ success: false, err });
+    res.status(400).json({ success: false, err: err.message });
   }
 });
 
 //get a user's groups
-router.get('/user', passport.authenticate('jwt', { session: false }), async (req, res) => {
+// i spent two hours looking at this and realized that we aren't even using it anymore lol
+/* router.get('/user', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
     const groups = await groupMemberController.getUsersGroups(req.user.id);
     if(!groups) {
@@ -57,7 +70,7 @@ router.get('/user', passport.authenticate('jwt', { session: false }), async (req
   } catch (err) {
     res.status(400).json({ success: false, err });
   }
-});
+}); */
 
 // remove a group
 router.delete('/', passport.authenticate('jwt', { session: false }), async (req, res) => {

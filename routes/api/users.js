@@ -9,14 +9,14 @@ const passport = require('passport');
 
 // the authenticate middleware checks for the current user stored in the jwt
 router.get('/me', passport.authenticate('jwt', { session: false }), (req, res) => {
-  delete req.user.password;
+  req.user.password = null;
   res.status(200).json({ success: true, profile: req.user});
 });
 
 // delete user
 router.delete('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const data = await UserController.deleteUser(req.user.id);
+    const data = await userController.deleteUser(req.user.id);
     // TODO: MAKE TOKEN EXPIRE (MAYBE FRONT-END THING)
     res.status(200).json({ success: true });
   } catch (err) {
@@ -27,10 +27,10 @@ router.delete('/', passport.authenticate('jwt', { session: false }), async (req,
 // update user
 router.put('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const data = await UserController.updateUser(req.body.user, req.user.id);
+    const data = await userController.updateUser(req.body.user, req.user.id);
     res.status(200).json({ success: true, data });
   } catch (err) {
-    res.status(400).json({ success: true, err });
+    res.status(400).json({ success: false, err: err.message });
   }
 });
 
