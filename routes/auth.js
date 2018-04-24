@@ -56,7 +56,7 @@ router.post('/verify', (req, res) => {
     if(err || !payload) { 
       res.status(400).json({ success: false }); 
     } else { 
-      res.status(200).json({ success: true }); 
+      res.status(200).json({ success: true, id: payload.id }); 
     }
   })
 });
