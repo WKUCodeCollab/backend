@@ -17,14 +17,15 @@ module.exports = function (io) {
         // once a client has connected, we expect to get a ping from them saying what room they want to join
         socket.on('room', function(roomNumber) {
             //create and join private room based on groupid
-            room = io.of("/"+roomNumber);
+            //room = io.of("/"+roomNumber);
             socket.join(roomNumber);
             roomNum = roomNumber;
 
             var roomCount = io.sockets.adapter.rooms[roomNum];
             if (roomCount.length == 1) {
+                body = "public class Main {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(\"Hello, World\");\n\t}\n}";
                 shell.exec("mkdir ~/userfiles/" + roomNum);
-                shell.exec("docker run -d -t -v ~/userfiles/" + roomNum + ":/usr/src/userfiles --name " + roomNum +" openjdk");
+                shell.exec("docker run -d -t -v ~/userfiles/" + roomNum + ":/usr/src/userfiles --name " + "cc" + roomNum +" openjdk");
             }
 
             // send signal to refresh editor to client
@@ -43,8 +44,8 @@ module.exports = function (io) {
             console.log('user disconnected');
             var roomCount = io.sockets.adapter.rooms[roomNum];
             if (!roomCount) {
-                shell.exec("docker container stop " + roomNum);
-                shell.exec("docker container rm " + roomNum);
+                shell.exec("docker container stop " + "cc" +  roomNum);
+                shell.exec("docker container rm " + "cc" + roomNum);
                 shell.exec("rm -r ~/userfiles/" + roomNum);
             }
         });
@@ -61,7 +62,7 @@ module.exports = function (io) {
         socket.on('editorChange', (changesObj) => {
             console.log("changes recieved: " + changesObj);
             if (changesObj.origin == '+input' || changesObj.origin == 'paste' || changesObj.origin == '+delete' || changesObj.origin == 'undo'){
-                io.in(roomNum).emit('editorChange', changesObj);
+                socket.to(roomNum).emit('editorChange', changesObj);
             }
         });
 
@@ -72,8 +73,8 @@ module.exports = function (io) {
             fs.writeFile('/home/mschapmire/userfiles/' + roomNum + '/Main.java', code.codeToRun, function (err) {
             if (err) throw err;
                 console.log('Saved!');
-                var shellCmd1 = 'docker exec -t ' + roomNum + ' /bin/sh -c "javac usr/src/userfiles/Main.java"';
-                var shellCmd2 = 'docker exec -t ' + roomNum + ' /bin/sh -c "cd usr/src/userfiles; java Main"';
+                var shellCmd1 = 'docker exec -t ' + "cc" + roomNum + ' /bin/sh -c "javac usr/src/userfiles/Main.java"';
+                var shellCmd2 = 'docker exec -t ' + "cc" + roomNum + ' /bin/sh -c "cd usr/src/userfiles; java Main"';
 
                 shell.exec(shellCmd1, function(code, stdout, stderr) {
                     console.log('Exit code 1:', code);
