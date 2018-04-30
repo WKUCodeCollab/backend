@@ -1,6 +1,7 @@
 //Chat code altered from: https://tutorialedge.net/typescript/angular/angular-socket-io-tutorial/
 const fs = require('fs');
 const shell = require('shelljs');
+const UserController = require('../controllers/user');
 
 // starting text for the code editor
 var body = "public class Main {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(\"Hello, World\");\n\t}\n}";
@@ -21,20 +22,26 @@ module.exports = function (io) {
                 socket.leave(room);
             });
 
-            //create and join private room based on groupid
-            socket.join(roomNumber, function () {
-                console.log(socket.id + " now in rooms ", socket.rooms);
-                //roomNum = roomNumber;
-                socket.room = roomNumber;
-                var roomCount = io.sockets.adapter.rooms[socket.room];
-                if (roomCount.length === 1) {
-                    body = "public class Main {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(\"Hello, World\");\n\t}\n}";
-                    shell.exec("mkdir ~/userfiles/" + socket.room);
-                    shell.exec("docker run -d -t -v ~/userfiles/" + socket.room + ":/usr/src/userfiles --name " + "cc" + socket.room +" openjdk");
-                }
-    
-                // send signal to refresh editor to client
-                io.in(socket.room).emit('refreshEditor', {body: body});
+            //get user's first name and set as socket username for messages
+            UserController.getUserById(roomNumber.userID)
+            .then(data => {
+                socket.username = data.firstName;
+
+                //create and join private room based on groupid
+                socket.join(roomNumber.groupID, function () {
+                    console.log(socket.id + " now in rooms ", socket.rooms);
+                    //roomNum = roomNumber;
+                    socket.room = roomNumber.groupID;
+                    var roomCount = io.sockets.adapter.rooms[socket.room];
+                    if (roomCount.length === 1) {
+                        body = "public class Main {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(\"Hello, World\");\n\t}\n}";
+                        shell.exec("mkdir ~/userfiles/" + socket.room);
+                        shell.exec("docker run -d -t -v ~/userfiles/" + socket.room + ":/usr/src/userfiles --name " + "cc" + socket.room +" openjdk");
+                    }
+        
+                    // send signal to refresh editor to client
+                    io.in(socket.room).emit('refreshEditor', {body: body});
+                });
             });
         });
         
@@ -62,7 +69,7 @@ module.exports = function (io) {
         // using `io.emit()`
         socket.on('message', (message) => {
             console.log("Message Received: " + message);
-            io.in(socket.room).emit('message', {type:'new-message', text: message});
+            io.in(socket.room).emit('message', {type:'new-message', text: message, name: socket.username});
         });
 
         // Receive editorChange signal and obj with changes, re-emit to all except sender
