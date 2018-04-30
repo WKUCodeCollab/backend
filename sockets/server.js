@@ -78,10 +78,27 @@ module.exports = function (io) {
         socket.on('runCode', (code) => {
             console.log("Code to run: " + code.codeToRun);
             fs.writeFile('/home/mschapmire/userfiles/' + socket.room + '/Main.java', code.codeToRun, function (err) {
-            if (err) throw err;
+                if (err) throw err;
+
                 console.log('Saved!');
                 var shellCmd1 = 'docker exec -t ' + "cc" + socket.room + ' /bin/sh -c "javac usr/src/userfiles/Main.java"';
-                var shellCmd2 = 'docker exec -t ' + "cc" + socket.room + ' /bin/sh -c "cd usr/src/userfiles; java Main"';
+                var shellCmd2;
+
+                //check if object has input property and append to command
+                if (code.hasOwnProperty('codeInput')){
+                    console.log("input: " + code.codeInput);
+
+                    fs.writeFile('/home/mschapmire/userfiles/' + socket.room + '/input.txt', code.codeInput, (err) => {
+                        if(err) {
+                            return console.log(err);
+                        }
+                        console.log("Input File saved successfully!");
+                        shellCmd2 = 'docker exec -t ' + "cc" + socket.room + ' /bin/sh -c "cd usr/src/userfiles; java Main < input.txt"';                                               
+                    });
+                }
+                else {
+                    shellCmd2 = 'docker exec -t ' + "cc" + socket.room + ' /bin/sh -c "cd usr/src/userfiles; java Main"';
+                }
 
                 shell.exec(shellCmd1, function(code, stdout, stderr) {
                     console.log('Exit code 1:', code);
