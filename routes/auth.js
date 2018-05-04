@@ -10,26 +10,14 @@ const router = express.Router();
 
 // login
 router.post('/login', passport.authenticate('local', { session: false }), (req, res) => {
-  // This stuff is already being done with the authenticate middleware
-  // The middleware adds the current user to the request object
-  /* UserController.getUserByEmail(req.body.email)
-  .then((user) => {
-    if (!user) return res.status(404).send('No user found.');
-
-    var passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-    if (!passwordIsValid) return res.status(401).send({ auth: false, token: null }); */
-
     const token = jwt.sign({ id: req.user.id }, secret, {
       expiresIn: 86400
     });
     res.status(200).json({ success: true, token });
-  /* }, (err) => {
-    if (err) return res.status(500).send('Error on the server.');
-  }); */
 });
 
 // logout
-// TODO: FRONT END MUST DESTROY JWT UPON CALLING LOGOUT
+// FRONT END MUST DESTROY JWT UPON CALLING LOGOUT
 router.get('/logout', (req, res) => {
   req.logout();
   res.status(200).json({ success: true });

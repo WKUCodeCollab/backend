@@ -5,7 +5,6 @@ const UserController = require('../controllers/user');
 
 // starting text for the code editor
 var body = "public class Main {\n\tpublic static void main(String[] args) {\n\t\tSystem.out.println(\"Hello, World\");\n\t}\n}";
-//var roomNum;
 
 module.exports = function (io) {
 
@@ -47,9 +46,9 @@ module.exports = function (io) {
         
 
         // update body when refreshEditor is recieved
-        socket.on('refreshEditor', function (body_) {
-            console.log('new body: ' + body_);
-            body = body_;
+        socket.on('refreshEditor', function (b) {
+            console.log('new body: ' + b);
+            body = b;
         });
 
         // Log whenever a client disconnects from our websocket server
