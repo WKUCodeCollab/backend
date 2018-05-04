@@ -1,0 +1,29 @@
+{
+  "development": {
+    "username": "root",
+    "password": "codecollab2018",
+    "database": "cc_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "operatorAliases": false,
+    "logging": false
+  },
+  "test": {
+    "username": "root",
+    "password": null,
+    "database": "database_test",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "operatorAliases": false,
+    "logging": false
+  },
+  "production": {
+    "username": "root",
+    "password": null,
+    "database": "database_production",
+    "host": "127.0.0.1",
+    "dialect": "mysql",
+    "operatorAliases": false,
+    "logging": false
+  }
+}
