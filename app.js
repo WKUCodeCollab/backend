@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(cors({ origin: 'http://45.55.196.206:4200/'}));
+app.use(cors({ origin: 'http://45.55.196.206:4200/' }));
 app.use(passport.initialize());
 
 app.use('/', index);
